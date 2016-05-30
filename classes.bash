@@ -6,7 +6,7 @@
 #
 #  @arg $1 string Name of class which should be created
 #  @arg $2 string Name of variable which will be set to instance.
-#  @arg $3 string Unique object identifier.
+#  @arg $@ any    Args for constructor.
 #
 # @see classes:require
 classes:new() {
@@ -60,7 +60,7 @@ classes:new() {
 #
 # @example
 #     classes:require foo.class.sh
-#     classes:new Foo var 12345
+#     classes:new Foo var
 #     $var::methodFoo
 #
 #  @arg $1 string Name of class which should be created

@@ -45,7 +45,7 @@ Class should be declared using following syntax:
 
 ```bash
   classes:require foo.class.sh
-  classes:new Foo var 12345
+  classes:new Foo var
   $var::methodFoo
 ```
 
