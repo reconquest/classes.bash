@@ -12,9 +12,13 @@
 classes:new() {
     local __class="$1"
     local __object="$2"
-    local __identifier="${3:-$RANDOM}"
+    shift 2
 
-    local __namespace=":classes:objects:${__class}:${__identifier}"
+    local __identifier=${__class}_$(
+        md5sum - <<< "${__class}_${__object}_${RANDOM}" | awk '{print $1}'
+    )
+
+    local __namespace=":classes:objects:${__identifier}"
 
     local __definition=$(
         :classes:get-object-definition \
@@ -26,7 +30,7 @@ classes:new() {
     builtin eval "$__definition"
 
     if typeset -f "${__namespace}::constructor" &>/dev/null; then
-        builtin eval "${__namespace}::constructor"
+        builtin eval "${__namespace}::constructor \"\$@\""
     fi
 }
 
@@ -68,6 +72,7 @@ classes:require() {
 
     alias '@class'=':classes:define-class'
     alias '@method'=':classes:define-method;'
+    alias '@var'=':classes:variables ${identifier}'
 
     local __shopt="$(shopt -p)"
     shopt -s expand_aliases
@@ -138,8 +143,36 @@ classes:require() {
     cat <<-METHOD
 :class:${__class}::${__function} () {
     local identifier="\$1"
-    local this=":classes:objects:${__class}:\${identifier}"
+    local this=":classes:objects:\${identifier}"
     shift
 $(declare -f "$__function" | tail -n+3)
 METHOD
+}
+
+:classes:get-variables() {
+    local identifier="$1"
+
+}
+
+:classes:variables() {
+    local identifier="$1"
+    local name="$2"
+    local value="${3:-}"
+
+    if [[ "$value" ]]; then
+        if [[ ! -v _classes_objects_variables_${identifier}_${name} ]]; then
+            builtin eval \
+                "_classes_objects_variables_${identifier}+=(${name})"
+        fi
+
+        builtin eval "_classes_objects_variables_${identifier}_${name}=\$value"
+        builtin eval $name=\$value
+        return
+    fi
+
+    if [[ ! -v _classes_objects_variables_$identifier ]]; then
+        return
+    fi
+
+    builtin eval $name=\$_classes_objects_variables_${identifier}_${name}
 }

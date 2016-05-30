@@ -1,13 +1,14 @@
 tests:put foo.class.bash <<CODE
 @class Foo
     @method work() {
-        echo "work - \$@"
-        shift
-        \$this::callme \$@
+        @var blah 123
+        \$this::callme
+        unset blah
     }
 
     @method callme() {
-        echo "callme - \$@"
+        @var blah
+        echo "callme:\$blah"
     }
 CODE
 
@@ -16,6 +17,5 @@ classes:new "Foo" "var"
 
 tests:ensure $var::work a b c
 tests:assert-no-diff stdout <<DIFF
-work - a b c
-callme - b c
+callme:123
 DIFF
