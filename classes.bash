@@ -128,10 +128,11 @@ classes:require() {
             )"
 
             builtin eval "$__definition"
+            unset -f "$__function"
         fi
     fi
 
-    __method_scope="$__actual_scope"
+    __method_scope=$(:classes:get-scope)
 }
 
 :classes:get-scope() {
