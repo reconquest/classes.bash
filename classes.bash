@@ -6,7 +6,7 @@
 #
 #  @arg $1 string Name of class which should be created
 #  @arg $2 string Name of variable which will be set to instance.
-#  @arg $@ any    Args for constructor.
+#  @arg $@ any    Args for construct.
 #
 # @see classes:require
 classes:new() {
@@ -29,8 +29,8 @@ classes:new() {
 
     builtin eval "$__definition"
 
-    if typeset -f "${__namespace}::constructor" &>/dev/null; then
-        builtin eval "${__namespace}::constructor \"\$@\""
+    if typeset -f "${__namespace}::construct" &>/dev/null; then
+        builtin eval "${__namespace}::construct \"\$@\""
     fi
 }
 
@@ -114,33 +114,38 @@ classes:require() {
     fi
 
     if [[ "$__method_scope" ]]; then
-        for __function in ${__actual_scope[@]}; do
-            if grep -Fq -- "$__function" <<< "$__method_scope"; then
-                continue
-            fi
+        if __diff=$(
+            diff -u0 <(echo "$__method_scope") <(echo "$__actual_scope") \
+                | tail -n+4 \
+                | sed 's/^+//'
+        ); then
+            :
+        else
+            __function=$__diff
 
             local __definition="$(
                 :classes:get-method-definition "$__class" "$__function"
             )"
 
             builtin eval "$__definition"
-
-            break
-        done
+        fi
     fi
 
     __method_scope="$__actual_scope"
 }
 
 :classes:get-scope() {
-    declare -F | cut -d' ' -f3 | grep -v '^:class:'
+    typeset -F | cut -d' ' -f3 | grep -v '^:' | grep -v '^tests:'
 }
 
 :classes:get-method-definition() {
     local __class="$1"
     local __function="$2"
+
     cat <<-METHOD
 :class:${__class}::${__function} () {
+    local __method__="$__function"
+    local __class__="$__class"
     local identifier="\$1"
     local this=":classes:objects:\${identifier}"
     shift
@@ -169,8 +174,10 @@ METHOD
         return
     fi
 
-    if [[ ! -v _classes_objects_variables_$identifier ]]; then
-        return
+    if [[ ! -v _classes_objects_variables_${identifier}_${name} ]]; then
+        echo "unexpected variable ($__class__::$__method__): ${name}"
+        exit 1
+        return 1
     fi
 
     builtin eval $name=\$_classes_objects_variables_${identifier}_${name}
