@@ -14,12 +14,6 @@ Creates instance of specified class.
   $var::methodFoo
 ```
 
-### Arguments
-
-* # @arg1 string Name of class which should be created
-* # @arg2 string Name of variable which will be set to instance.
-* # @arg3 string Unique object identifier.
-
 #### See also
 
 * [classes:require](#classes:require)
@@ -54,8 +48,4 @@ Class should be declared using following syntax:
   classes:new Foo var 12345
   $var::methodFoo
 ```
-
-### Arguments
-
-* # @arg1 string Name of class which should be created
 

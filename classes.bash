@@ -4,9 +4,9 @@
 #     classes:new ClassName var 12345
 #     $var::methodFoo
 #
-# @arg1 string Name of class which should be created
-# @arg2 string Name of variable which will be set to instance.
-# @arg3 string Unique object identifier.
+#  @arg $1 string Name of class which should be created
+#  @arg $2 string Name of variable which will be set to instance.
+#  @arg $3 string Unique object identifier.
 #
 # @see classes:require
 classes:new() {
@@ -59,7 +59,7 @@ classes:new() {
 #     classes:new Foo var 12345
 #     $var::methodFoo
 #
-# @arg1 string Name of class which should be created
+#  @arg $1 string Name of class which should be created
 classes:require() {
     local __filename="$1"
 
