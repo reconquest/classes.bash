@@ -124,7 +124,6 @@ classes:require() {
             )"
 
             builtin eval "$__definition"
-            unset "$__function"
 
             break
         done
